@@ -5,7 +5,7 @@ class Arduino:
 
     def_init_(self, port, baudrate=115200)
 
-    self.ser = serial.Serial(
+    self.serial = serial.Serial(
         port, 
         baudrate, 
         timeout=1
@@ -15,9 +15,9 @@ class Arduino:
 
 def send_command(self, command):
 
-    self.ser.write(
-        (command + "\n").encode()
+    self.serial.write(
+        f"{command}\n".encode()
     )
 
     def close(self):
-        self.ser.close()
+        self.serial.close()
