@@ -23,20 +23,32 @@ class Arduino: #Interface for communicating with Arduino
         #Give Arduino time to reboot after opening serial
         time.sleep(2)
 
-#Send a command string to the Arduino
-def send_command(self, command):
+    #Send a command string to the Arduino
+    def send_command(self, command):
 
-    self.serial.write(
+        self.serial.write(
         f"{command}\n".encode()
-    )
+        )
 
-#Add trigger funtions for light and airpuff
-def trigger_light(self):
-    self.send_commang("LIGHT")
+    #Add trigger funtions for light and airpuff
+    def trigger_light(self):
+        self.send_command("LIGHT")
 
-def trigger_airpuff(self):
-    self.send_command("AIRPUFF")
+    def trigger_airpuff(self):
+        self.send_command("AIRPUFF")
 
-#Close serial connection
-def close(self):
-    self.serial.close()
+    #Read information about manual stimulations
+    def read_message(self):
+
+        if self.serial.in_waiting:
+
+            return (
+                self.serial.readline()
+                .decode(errors="ignore")
+                .strip()
+            )
+        return None
+
+    #Close serial connection
+    def close(self):
+        self.serial.close()

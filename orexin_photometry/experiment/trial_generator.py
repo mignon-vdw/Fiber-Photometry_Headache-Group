@@ -32,13 +32,28 @@ def generate_trials():
     #Converts stimulus names into Trial objects
     for i, stimulus in enumerate(stimuli):
 
-        trial = Trial(
-            trial_number=i + 1,
-            stimulus=stimulus, 
-            stimulus_duration_ms=100,
-            iti_s=random.uniform(10,20)
-        )
+        if stimulus == "light":
 
+            trial = Trial(
+                        trial_number=i + 1,
+                        stimulus="light", 
+                        stimulus_duration_ms=50,
+                        ttl_duration_ms=25,
+                        arduino_command="LIGHT"
+                        iti_s=random.uniform(10,20)
+                    )
+            
+        elif stimulus == "airpuff":
+
+            trial = Trial(
+                        trial_number=i + 1,
+                        stimulus=stimulus, 
+                        stimulus_duration_ms=100,
+                        ttl_duration_ms=100,
+                        arduino_command="AIRPUFF"
+                        iti_s=random.uniform(10,20)
+                    )
+            
         trials.append(trial)
 
     return trials

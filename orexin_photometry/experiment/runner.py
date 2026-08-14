@@ -13,19 +13,26 @@ arduino: Arduino
 Active Arduino controller object.
 """
 
-import time 
+from orexin_photometry.logging.session_logger import SessionLogger
 
-def run_session(trials, arduino):
+import time 
+from datetime import datetime
+
+def run_session(trials, arduino, logger):
 
     for trial in trials:
 
         print(
-            f"Running Trial"
-            f"trial.trial_number"
+            f"{datetime.now()} | "
+            f"Running Trial {trial.trial_number}:"
+            f"{trial.stimulus}"
         )
 
         #Wait for scheduled ITI
-        time.sleep(trial.iti.s)
+        time.sleep(trial.iti_s)
+
+        #Log trial
+        logger.log_trial(trial)
 
         #Deliver the stimulus
         if trial.stimulus == "light":

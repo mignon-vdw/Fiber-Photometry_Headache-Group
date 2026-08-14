@@ -1,0 +1,9 @@
+from event_logger import EventLogger
+
+logger = EventLogger("event_log.csv")
+
+logger.log_event("cheek_pinch")
+
+print(EventLogger)
+
+print("Logger created successfully")

@@ -35,5 +35,6 @@ class Trial:
     stimulus: str
     stimulus_duration_ms: int
     ttl_duration_ms: int
+    arduino_command: str
     iti_s: float
     
