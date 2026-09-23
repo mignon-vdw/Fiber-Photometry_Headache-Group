@@ -57,7 +57,8 @@ def extract_perievent_traces(
     signal_name: str
     pre_window: float (#seconds before event)
     post_window: float (#seconds after event)
-    baseline_subtract: bool (#subtract mean pre-event baseline from each trial)
+    baseline_method: str (#non, "subtract" or "zscore")
+    baseline_window: tuple (#baseline period used for normalisation)
 
     Returns
     -----
@@ -136,6 +137,10 @@ def extract_perievent_traces(
 
         elif baseline_method == "zscore":
 
+            if baseline_std == 0:
+                excluded_events += 1
+                continue
+
             trace = (
                 trace - baseline_mean
             ) / baseline_std
@@ -147,7 +152,7 @@ def extract_perievent_traces(
                 f"{baseline_method}"
             )
             
-            trace_list.append(trace)
+        trace_list.append(trace)
     
     if len(trace_list) == 0:
         raise ValueError(
@@ -160,7 +165,7 @@ def extract_perievent_traces(
         "trace_matrix": trace_matrix,
         "time_axis": time_axis,
         "n_events": len(trace_list),
-        "n_events_excluded", excluded_events
+        "n_events_excluded": excluded_events
     }
 
 def calculate_psth(
@@ -430,11 +435,11 @@ def run_all_event_analyses(
             baseline_window = baseline_window
         )
 
-        session.metadata.setdefault(
-            "analysis", {}
-        )
+    session.metadata.setdefault(
+        "analysis", {}
+    )
 
-        session.metadata["analysis"].update({
+    session.metadata["analysis"].update({
 
         "signal_used": signal_name,
 
@@ -447,6 +452,6 @@ def run_all_event_analyses(
         "baseline_method": baseline_method,
 
         "baseline_window_s": baseline_window
-        })
+    })
 
-        return session
+    return session
