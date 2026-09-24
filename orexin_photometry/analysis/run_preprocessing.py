@@ -19,6 +19,7 @@ from orexin_photometry.io import (
     get_or_create_session_metadata,
     session_id,
     output_path
+    save_session_metadata
 )
 
 from orexin_photometry.events import (
@@ -55,6 +56,8 @@ session = load_session(
     os.path.join(data_folder, json_filename),
 )
 
+session = get_or_create_session_metadata(session)
+
 #Extract TTL events
 session = extract_events(session)
 
@@ -74,17 +77,20 @@ session = calculate_zscore(session)
 #Save metadata after processing
 
 session.metadata["processing"] = {
-    "lowpass_filter": True,
+    "lowpass_filter": 10,
+
+    "filter_order": 2,
 
     "photobleaching_correction": "double_exponential",
 
     "motion_correction": "linear_regression",
 
-    "normalisation": [
-        "dff", 
-        "zscore"
-    ]
+    "dff_method": "median_baseline",
+
+    "zscore_method": "session"
 }
+
+save_session_metadata(session)
 
 #Quality control figures 
 

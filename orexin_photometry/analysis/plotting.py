@@ -391,7 +391,7 @@ axes[1].set_xlabel(
 "Time (s)"
 )
  
-axes[1].set_title(
+axes[1].set_title(  
 "Session-wide Z-score"
 )
  

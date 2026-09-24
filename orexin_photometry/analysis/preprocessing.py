@@ -84,25 +84,25 @@ def correct_photobleaching(session):
             1000
         ]
 
-    params, _ = curve_fit(
-        double_exponential,
-        t,
-        signal,
-        p0=p0,
-        maxfev=10000
-    )
+        params, _ = curve_fit(
+            double_exponential,
+            t,
+            signal,
+            p0=p0,
+            maxfev=10000
+        )
 
-    fit = double_exponential(
-        t,
-        *params
-    )
+        fit = double_exponential(
+            t,
+            *params
+        )
 
-    corrected = signal - fit
+        corrected = signal - fit
 
-    session.processed[f"{signal_name}_bleach_fit"] = fit
-    session.processed[f"{signal_name}_bleach_corrected"] = corrected
+        session.processed[f"{signal_name}_bleach_fit"] = fit
+        session.processed[f"{signal_name}_bleach_corrected"] = corrected
 
-    return session
+        return session
 
 #Remove motion-related fluctuations using TdTomato regression
 def motion_correct(session):

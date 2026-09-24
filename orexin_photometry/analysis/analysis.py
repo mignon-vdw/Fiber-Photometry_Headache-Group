@@ -101,6 +101,10 @@ def extract_perievent_traces(
 
         event_time = event["time_s"]
 
+        event_times_used = []
+
+        event_times_used.append(event_time)
+
         center_idx = np.argmin(
             np.abs(time_s - event_time)
         )
@@ -166,6 +170,7 @@ def extract_perievent_traces(
         "time_axis": time_axis,
         "n_events": len(trace_list),
         "n_events_excluded": excluded_events
+        "event_times": event_times_used
     }
 
 def calculate_psth(
@@ -396,7 +401,9 @@ def run_event_analysis(
 
         "baseline_window_s": baseline_window,
 
-        "n_events_excluded": extracted["n_events_excluded"]
+        "n_events_excluded": extracted["n_events_excluded"],
+
+        "event_times": extracted["event_times"]
     }
 
     return session
