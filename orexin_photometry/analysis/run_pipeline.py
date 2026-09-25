@@ -49,9 +49,8 @@ from orexin_photometry.plotting import (
     plot_bleach_correction,
     plot_motion_correction,
     plot_normalised_signals,
-    #future functions
-    #plot_psth
-    #plot_heatmap
+    plot_psth,
+    plot_heatmap
 )
 
 #Command line arguments for input files
@@ -128,7 +127,7 @@ session = load_session(
 
 session = get_or_create_session_metadata(
     session,
-    meta_dir=metadata_dir
+    meta_dir=meta_dir
     )
 
 #Extract TTL events
@@ -174,7 +173,7 @@ session.metadata["processing"] = {
 
 save_session_metadata(
     session, 
-    meta_dir=metadata_dir
+    meta_dir=meta_dir
     )
 
 #Quality control figures 
@@ -248,7 +247,7 @@ plt.close(fig)
 
 session = run_all_event_analyses(
     session,
-    signal_name = "zscore",
+    signal_name = signal_name,
     pre_window = pre_window, 
     post_window = post_window, 
     response_window=(0,2),

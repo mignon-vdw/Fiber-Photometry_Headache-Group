@@ -57,7 +57,7 @@ def extract_perievent_traces(
     signal_name: str
     pre_window: float (#seconds before event)
     post_window: float (#seconds after event)
-    baseline_method: str (#non, "subtract" or "zscore")
+    baseline_method: str (#none, "subtract" or "zscore")
     baseline_window: tuple (#baseline period used for normalisation)
 
     Returns
@@ -97,11 +97,12 @@ def extract_perievent_traces(
         (time_axis < baseline_window[1])
     )
 
+    event_times_used = []
+
     for event in selected_events:
 
         event_time = event["time_s"]
 
-        event_times_used = []
 
         event_times_used.append(event_time)
 
@@ -169,7 +170,7 @@ def extract_perievent_traces(
         "trace_matrix": trace_matrix,
         "time_axis": time_axis,
         "n_events": len(trace_list),
-        "n_events_excluded": excluded_events
+        "n_events_excluded": excluded_events,
         "event_times": event_times_used
     }
 

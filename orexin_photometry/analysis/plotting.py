@@ -14,15 +14,16 @@ plot_heatmap()
 
 import numpy as np
 import matplotlib.pyplot as plt
+from orexin_photometry.io import session_id
 
-def _margin(x, frac=0.05):
+def _margin(signal, frac=0.05):
     """
-    Add a small marginaround y-axis limits
+    Add a small margin around y-axis limits
     """
     span = np.ptp(signal)
 
     return (
-        np.min(signal) - frac * span
+        np.min(signal) - frac * span,
         np.max(signal) + frac * span
     )
 
@@ -37,22 +38,22 @@ def plot_raw_signals(session):
     tdtom = session.raw["tdtom"]
 
     fig,ax1=plt.subplots(
-        fig.size=(14,8)
+        figsize=(14,8)
     ) # create a plot to allow for dual y-axes plotting
 
     line1 = ax1.plot(
-        time_seconds, 
+        time, 
         gcamp, 
-        colour="green", 
+        color="green", 
         label='GCaMP8s'
     ) #plot GCaMP8s on left y-axis
 
     ax2=ax1.twinx()# create a right y-axis, sharing x-axis on the same plot
 
-    line1 = ax1.plot(
-        time_seconds, 
+    line2 = ax2.plot(
+        time, 
         tdtom, 
-        colour="red", 
+        color="red", 
         label='TdTomato'
     ) #plot TdTomato on right y-axis
 
@@ -65,12 +66,12 @@ def plot_raw_signals(session):
     event_colours = {
         "airpuff": "tab:orange",
         "led_flash": "tab:blue",
-        "tail_pinch": "tab:purple".
+        "tail_pinch": "tab:purple",
         "unknown": "gray"
     }
 
     tick_y = (
-        ax1.get_ylin()[1]
+        ax1.get_ylim()[1]
         -0.05 * np.ptp(ax1.get_ylim())
     )
 
@@ -88,7 +89,7 @@ def plot_raw_signals(session):
             times, 
             np.full(len(times), tick_y), 
             label=event_type,
-            color=event_colors.get(event_type, 'black'),
+            color=event_colours.get(event_type, 'black'),
             marker='|', 
             linestyle='None'
         )
@@ -108,160 +109,6 @@ def plot_raw_signals(session):
     return fig
     
 #Plot denoised signals 
-def plot_raw_signals(session):
-
-    time = session.raw["time_s"]
-
-    fig, axes = plt.subplots()
-
-
-#set default plot properties
-plt.rcParams['figure.figsize'] = [14, 12] # Make default figure size larger.
-plt.rcParams['axes.xmargin'] = 0          # Make default margin on x axis zero.
-plt.rcParams['axes.labelsize'] = 12     #Set default axes label size 
-plt.rcParams['axes.titlesize']=15
-plt.rcParams['axes.titleweight']='heavy'
-plt.rcParams['ytick.labelsize']= 10
-plt.rcParams['xtick.labelsize']= 10
-plt.rcParams['legend.fontsize']=12
-plt.rcParams['legend.markerscale']=2
-
-"""
-plotting.py
-
-Plotting functions for fiber photometry preprocessing
-and event-aligned analyses.
-
-Functions
----------
-plot_raw_signals()
-plot_denoised_signals()
-plot_bleach_correction()
-plot_motion_correction()
-plot_normalised_signals()
-plot_psth()
-plot_heatmap()
-"""
-
-import numpy as np
-import matplotlib.pyplot as plt
-
-
-# =============================================================================
-# Helper functions
-# =============================================================================
-
-def _margin(signal, frac=0.05):
-    """
-    Add a small margin around y-axis limits.
-    """
-
-    span = np.ptp(signal)
-
-    return (
-        np.min(signal) - frac * span,
-        np.max(signal) + frac * span
-    )
-
-
-# =============================================================================
-# Raw signals
-# =============================================================================
-
-def plot_raw_signals(session):
-
-    time = session.raw["time_s"]
-
-    gcamp = session.raw["gcamp"]
-
-    tdtom = session.raw["tdtom"]
-
-    fig, ax1 = plt.subplots(
-        figsize=(14, 8)
-    )
-
-    line1 = ax1.plot(
-        time,
-        gcamp,
-        color="green",
-        label="GCaMP8s"
-    )
-
-    ax2 = ax1.twinx()
-
-    line2 = ax2.plot(
-        time,
-        tdtom,
-        color="red",
-        label="tdTomato"
-    )
-
-    ax1.set_ylim(*_margin(gcamp))
-
-    ax2.set_ylim(*_margin(tdtom))
-
-    event_lines = []
-
-    event_colors = {
-        "airpuff": "tab:orange",
-        "led_flash": "tab:blue",
-        "tail_pinch": "tab:purple",
-        "unknown": "gray"
-    }
-
-    tick_y = (
-        ax1.get_ylim()[1]
-        - 0.05 * np.ptp(ax1.get_ylim())
-    )
-
-    for event_type in sorted(
-        set(e["type"] for e in session.events)
-    ):
-
-        times = [
-            e["time_s"]
-            for e in session.events
-            if e["type"] == event_type
-        ]
-
-        event_lines += ax1.plot(
-            times,
-            np.full(len(times), tick_y),
-            marker="|",
-            linestyle="None",
-            color=event_colors.get(
-                event_type,
-                "black"
-            ),
-            label=event_type
-        )
-
-    ax1.set_xlabel("Time (s)")
-    ax1.set_ylabel("GCaMP8s (V)")
-    ax2.set_ylabel("tdTomato (V)")
-
-    ax1.set_title(
-        "Raw Photometry Signals"
-    )
-
-    lines = line1 + line2 + event_lines
-
-    labels = [
-        line.get_label()
-        for line in lines
-    ]
-
-    ax1.legend(lines, labels)
-
-    fig.tight_layout()
-
-    return fig
-
-
-# =============================================================================
-# Denoised signals
-# =============================================================================
-
 def plot_denoised_signals(session):
 
     time = session.raw["time_s"]
@@ -270,7 +117,7 @@ def plot_denoised_signals(session):
         2,
         1,
         sharex=True,
-        figsize=(14, 8)
+        figsize=(14,8)
     )
 
     axes[0].plot(
@@ -283,31 +130,33 @@ def plot_denoised_signals(session):
         "Low-pass Filtered GCaMP"
     )
 
-    axes[0].set_ylabel("GCaMP")
+    axes[0].set_ylabel(
+        "GCaMP"
+    )
 
     axes[1].plot(
-        time,
+        time, 
         session.processed["tdtom_denoised"],
         color="red"
     )
 
     axes[1].set_title(
-        "Low-pass Filtered tdTomato"
+        "Low-pass Filtered TdTomato"
     )
 
-    axes[1].set_ylabel("tdTomato")
+    axes[1].set_ylabel(
+        "TdTomato"
+    )
 
-    axes[1].set_xlabel("Time (s)")
+    axes[1].set_xlabel(
+        "Time (s)"
+    )
 
     fig.tight_layout()
 
     return fig
 
-
-# =============================================================================
-# Bleaching correction
-# =============================================================================
-
+#Plot bleaching correction
 def plot_bleach_correction(session):
 
     time = session.raw["time_s"]
@@ -315,31 +164,26 @@ def plot_bleach_correction(session):
     fig, axes = plt.subplots(
         2,
         1,
-        figsize=(14, 10)
+        figsize=(14,10)
     )
 
     axes[0].plot(
         time,
-        session.processed[
-            "gcamp_denoised"
-        ],
+        session.processed["gcamp_denoised"],
+        color="green",
         alpha=0.5,
         label="Signal"
     )
 
     axes[0].plot(
         time,
-        session.processed[
-            "gcamp_denoised_bleach_fit"
-        ],
+        session.processed["gcamp_denoised_bleach_fit"],
         label="Double Exp Fit"
     )
 
     axes[0].plot(
         time,
-        session.processed[
-            "gcamp_denoised_bleach_corrected"
-        ],
+        session.processed["gcamp_denoised_bleach_corrected"],
         label="Corrected"
     )
 
@@ -351,45 +195,39 @@ def plot_bleach_correction(session):
 
     axes[1].plot(
         time,
-        session.processed[
-            "tdtom_denoised"
-        ],
+        session.processed["tdtom_denoised"],
+        color="red",
         alpha=0.5,
         label="Signal"
     )
 
     axes[1].plot(
         time,
-        session.processed[
-            "tdtom_denoised_bleach_fit"
-        ],
+        session.processed["tdtom_denoised_bleach_fit"],
         label="Double Exp Fit"
     )
 
     axes[1].plot(
         time,
-        session.processed[
-            "tdtom_denoised_bleach_corrected"
-        ],
+        session.processed["tdtom_denoised_bleach_corrected"],
         label="Corrected"
     )
 
     axes[1].legend()
 
     axes[1].set_title(
-        "tdTomato Bleaching Correction"
+        "TdTomato Bleaching Correction"
     )
 
-    axes[1].set_xlabel("Time (s)")
+    axes[1].set_xlabel(
+        "Time (s)"
+    )
 
     fig.tight_layout()
 
     return fig
 
-
-# =============================================================================
-# Motion correction
-# =============================================================================
+#Plot motion-corrected signals
 
 def plot_motion_correction(session):
 
@@ -398,22 +236,18 @@ def plot_motion_correction(session):
     fig, axes = plt.subplots(
         2,
         1,
-        figsize=(14, 10)
+        figsize=(14,10)
     )
 
     axes[0].plot(
         time,
-        session.processed[
-            "gcamp_denoised_bleach_corrected"
-        ],
+        session.processed["gcamp_denoised_bleach_corrected"],
         label="GCaMP"
     )
 
     axes[0].plot(
         time,
-        session.processed[
-            "motion_fit"
-        ],
+        session.processed["motion_fit"],
         label="Motion Fit"
     )
 
@@ -425,9 +259,7 @@ def plot_motion_correction(session):
 
     axes[1].plot(
         time,
-        session.processed[
-            "motion_corrected"
-        ],
+        session.processed["motion_corrected"],
         color="blue"
     )
 
@@ -435,16 +267,11 @@ def plot_motion_correction(session):
         "Motion Corrected Signal"
     )
 
-    axes[1].set_xlabel("Time (s)")
-
     fig.tight_layout()
 
     return fig
 
-
-# =============================================================================
-# Normalised signals
-# =============================================================================
+#Normalised signals
 
 def plot_normalised_signals(session):
 
@@ -454,7 +281,7 @@ def plot_normalised_signals(session):
         2,
         1,
         sharex=True,
-        figsize=(14, 10)
+        figsize=(14,10)
     )
 
     axes[0].plot(
@@ -469,38 +296,32 @@ def plot_normalised_signals(session):
         "dF/F (%)"
     )
 
-    axes[1].plot(
+     axes[1].plot(
         time,
         session.processed["zscore"],
         color="blue"
     )
 
-    axes[1].set_title(
-        "Session-wide Z-score"
-    )
+    axes[1].set_title("Session-wide Z-score")
 
     axes[1].set_ylabel(
         "Z-score"
     )
 
-    axes[1].set_xlabel("Time (s)")
+    axes[1].set_xlabel(
+        "Time (s)"
+    )
 
     fig.tight_layout()
 
     return fig
 
-
-# =============================================================================
-# PSTH
-# =============================================================================
+#Plot event-aligned PSTH
 
 def plot_psth(
     session,
     event_type
 ):
-    """
-    Plot peri-stimulus time histogram.
-    """
 
     result = session.analysis[
         event_type
@@ -519,7 +340,7 @@ def plot_psth(
     ]
 
     fig, ax = plt.subplots(
-        figsize=(8, 5)
+        figsize=(8,5)
     )
 
     ax.plot(
@@ -552,25 +373,20 @@ def plot_psth(
     )
 
     ax.set_title(
-        f"PSTH: {event_type}"
+        f"PSTH: {event_type}\n"
+        f"{session_id(session)}"
     )
 
     fig.tight_layout()
 
     return fig
 
-
-# =============================================================================
-# Heatmap
-# =============================================================================
+#Plot event-aligned heatmap
 
 def plot_heatmap(
     session,
     event_type
 ):
-    """
-    Plot peri-event heatmap.
-    """
 
     result = session.analysis[
         event_type
@@ -585,12 +401,12 @@ def plot_heatmap(
     ]
 
     fig, ax = plt.subplots(
-        figsize=(8, 6)
+        figsize=(8,6)
     )
 
     image = ax.imshow(
-        traces,
-        aspect="auto",
+        traces, 
+        aspect = "auto",
         origin="lower",
         extent=[
             time_axis[0],
@@ -617,7 +433,8 @@ def plot_heatmap(
     )
 
     ax.set_title(
-        f"Heatmap: {event_type}"
+        f"Heatmap: {event_type}\n"
+        f"{session_id(session)}"
     )
 
     cbar = fig.colorbar(
@@ -632,7 +449,3 @@ def plot_heatmap(
     fig.tight_layout()
 
     return fig
-
-
-
-

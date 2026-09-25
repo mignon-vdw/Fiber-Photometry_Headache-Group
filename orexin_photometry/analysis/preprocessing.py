@@ -102,7 +102,7 @@ def correct_photobleaching(session):
         session.processed[f"{signal_name}_bleach_fit"] = fit
         session.processed[f"{signal_name}_bleach_corrected"] = corrected
 
-        return session
+    return session
 
 #Remove motion-related fluctuations using TdTomato regression
 def motion_correct(session):
